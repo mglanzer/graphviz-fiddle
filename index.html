@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<style>
+			body {
+				font-family: consolas, sans-serif;
+				font-size: 60%;
+			}
+			#editor { 
+		        position: absolute;
+		        top: 0;
+		        right: 0;
+		        bottom: 0;
+		        left: 0;
+				width: 39%;
+		    }
+			.row{ width:100%; display: inline-block }
+			.row-40{ width:39% }
+			.row-60{ width:59% }
+		</style>
+	</head>
+	<body>
+		<div class="grid">
+			<div class="row row-40">
+<div id="editor">digraph G {
+}</div>
+			</div>
+			<div class="row row-60">
+				<div id="js-graph"></div>
+			</div>
+		</div>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="ace/ace.js"></script>
+		<script src="viz.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>
