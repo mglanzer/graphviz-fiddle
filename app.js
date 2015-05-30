@@ -18,6 +18,14 @@ function debounce(func, wait, immediate) {
 	};
 }
 
+// Thanks MDN
+// https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#Solution_.231_.E2.80.93_escaping_the_string_before_encoding_it
+function b64EncodeUnicode(str) {
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode('0x' + p1);
+    }));
+}
+
 function expandMacros(s) {
 	// capture class: .name[attributes to expand]
 	var classRegEx = /\!\W*\.(\w+)\[([\w=\"]+)\]/;
@@ -40,8 +48,6 @@ function expandMacros(s) {
 		}
 	}
 
-	console.log(classMacros);
-
 	for (var i = 0; i < nonMacros.length; i++) {
 		var line = nonMacros[i];
 		
@@ -49,8 +55,6 @@ function expandMacros(s) {
 			if(line.indexOf("." + p) > 0) {
 				var a = line.split("." + p);
 				line = a[0] + classMacros[p] + a[1];
-				
-				console.log(line);
 			}
 		}
 		
@@ -59,6 +63,22 @@ function expandMacros(s) {
 	
 	return result.join('\n');
 }
+
+var APIHOST = 'http://handyapi.local';
+
+// http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+var urlParams;
+(window.onpopstate = function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+})();
 
 $(document).ready(function($) {
 	var $graph = $('#js-graph');
@@ -69,14 +89,47 @@ $(document).ready(function($) {
 	
 	editor.setValue(window.localStorage.getItem("dot"));
 	
-	editor.on('change', debounce(function() {
-		var val = editor.getValue();
-		
+	if(urlParams.gb64) {
+		editor.setValue(atob(urlParams.gb64));
+		renderGraph();
+	}
+	
+	function getGraphExpanded() {
+		return expandMacros(getGraphRaw());
+	}
+	
+	function getGraphRaw() {
+		return editor.getValue();
+	}
+	
+	function renderGraph() {
+		$graph.html(Viz(getGraphExpanded(), 'svg'));
+	}
+	
+	function saveGraph() {
 		// Save pre-expanded values
-		window.localStorage.setItem("dot", val);
+		window.localStorage.setItem("dot", getGraphRaw());
+	}
+	
+	editor.on('change', debounce(function() {
+		saveGraph();
+		renderGraph();
+	}, 200));
+	
+	$graph.on('dblclick', function() {
+		var val = encodeURIComponent(getGraphExpanded());
+		var url = APIHOST + '/graph/png/img?chart='+ val +'&api_key=ajf0w94r829jq81qkl234jq32kjrq0ruisuafljsdklfj112';
+		var html = '<img src="' + url + '" />';
 		
-		val = expandMacros(val);
+		var w = window.open(url, '_blank');
+		w.document.body.innerHTML = html;
+	});
+	
+	$('#js-createlink').on('click', function() {
+		var graphB46 = encodeURIComponent(b64EncodeUnicode(getGraphRaw()));
 		
-		$graph.html(Viz(val, 'svg'));
-	}, 100));
+		var url = window.location.href + '?gb64=' + graphB46;
+		
+		window.open(url, '_blank');
+	});
 });

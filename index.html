@@ -5,9 +5,12 @@
 				font-family: consolas, sans-serif;
 				font-size: 60%;
 			}
+			#header {
+				height:40px;
+			}
 			#editor { 
 		        position: absolute;
-		        top: 0;
+		        top: 40px;
 		        right: 0;
 		        bottom: 0;
 		        left: 0;
@@ -19,6 +22,9 @@
 		</style>
 	</head>
 	<body>
+		<div id="header">
+			<button id="js-createlink">get link</button>
+		</div>
 		<div class="grid">
 			<div class="row row-40">
 <div id="editor">digraph G {
