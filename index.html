@@ -19,11 +19,13 @@
 			.row{ width:100%; display: inline-block }
 			.row-40{ width:39% }
 			.row-60{ width:59% }
+			.hidden { display: none }
 		</style>
 	</head>
 	<body>
 		<div id="header">
 			<button id="js-createlink">get link</button>
+			<button id="js-createPng">get png</button>
 		</div>
 		<div class="grid">
 			<div class="row row-40">
@@ -35,9 +37,16 @@
 			</div>
 		</div>
 		
+		<script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script> 
+		<script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
+		<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script> 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 		<script src="ace/ace.js"></script>
 		<script src="viz.js"></script>
 		<script src="app.js"></script>
+		
+		<div class="hidden">
+			<canvas id="canvas" width="1000px" height="600px"></canvas>
+		</div> 
 	</body>
 </html>

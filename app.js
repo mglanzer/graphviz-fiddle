@@ -27,8 +27,11 @@ function b64EncodeUnicode(str) {
 }
 
 function expandMacros(s) {
-	// capture class: .name[attributes to expand]
-	var classRegEx = /\!\W*\.(\w+)\[([\w=\"]+)\]/;
+	
+	// Class Macro: expands attributes - .name[attributes to expand]
+	// Usage: node[.classA .classB normalAtt="value"]
+	var classRegEx = /\!\W*\.(\w+)\[([\w=\" ]+)\]/;
+		
 	var lines = s.split('\n');
 	var result = [];
 	
@@ -87,12 +90,12 @@ $(document).ready(function($) {
     editor.setTheme("ace/theme/monokai");
     editor.getSession().setMode("ace/mode/text");
 	
+	// Load local storage value, allow querystring graph to override, then render
 	editor.setValue(window.localStorage.getItem("dot"));
-	
 	if(urlParams.gb64) {
 		editor.setValue(atob(urlParams.gb64));
-		renderGraph();
 	}
+	renderGraph();
 	
 	function getGraphExpanded() {
 		return expandMacros(getGraphRaw());
@@ -116,20 +119,21 @@ $(document).ready(function($) {
 		renderGraph();
 	}, 200));
 	
-	$graph.on('dblclick', function() {
-		var val = encodeURIComponent(getGraphExpanded());
-		var url = APIHOST + '/graph/png/img?chart='+ val +'&api_key=ajf0w94r829jq81qkl234jq32kjrq0ruisuafljsdklfj112';
-		var html = '<img src="' + url + '" />';
-		
-		var w = window.open(url, '_blank');
-		w.document.body.innerHTML = html;
-	});
-	
 	$('#js-createlink').on('click', function() {
 		var graphB46 = encodeURIComponent(b64EncodeUnicode(getGraphRaw()));
 		
 		var url = window.location.href + '?gb64=' + graphB46;
 		
 		window.open(url, '_blank');
+	});
+	
+	$('#js-createPng').on('click', function () {
+		var c = document.getElementById('canvas');
+		canvg(c, $graph.html());
+		
+		var dataUrl = c.toDataURL('image/png');
+		
+		var w = window.open('', '_blank');
+		w.document.body.innerHTML = '<img src="' + dataUrl + '" />';
 	});
 });
