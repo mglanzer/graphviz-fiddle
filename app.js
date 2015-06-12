@@ -84,6 +84,17 @@ var urlParams;
 })();
 
 $(document).ready(function($) {
+	if(urlParams.mode && urlParams.gb64) {
+		var c = document.getElementById('canvas');
+		canvg(c, Viz(expandMacros(atob(urlParams.gb64)), 'svg'));
+		
+		var dataUrl = c.toDataURL('image/png');
+		
+		document.write('<img src="' + dataUrl + '" />');
+		
+		return;
+	}
+	
 	var $graph = $('#js-graph');
 	
 	var editor = ace.edit("editor");
@@ -135,5 +146,13 @@ $(document).ready(function($) {
 		
 		var w = window.open('', '_blank');
 		w.document.body.innerHTML = '<img src="' + dataUrl + '" />';
+	});
+	
+	$('#js-modePng').on('click', function() {
+		var graphB46 = encodeURIComponent(b64EncodeUnicode(getGraphRaw()));
+		
+		var url = window.location.href + '?mode=png&gb64=' + graphB46;
+		
+		window.open(url, '_blank');
 	});
 });
